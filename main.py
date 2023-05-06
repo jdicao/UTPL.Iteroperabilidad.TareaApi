@@ -4,30 +4,40 @@ from typing import List, Optional
 
 app = FastAPI()
 
-class Persona(BaseModel):
+class Vehiculo (BaseModel):
     id: int
-    nombre: str
-    edad: int
-    ciudad: Optional[str] = None
+    tipo: str
+    marca: str
+    modelo: str
+    anio: int
+    descripcion: Optional[str] = None
 
-listaPersonas = []
+vehiculoList = []
 
-@app.post("/personas", response_model=Persona)
-def crear_persona(person: Persona):
-    listaPersonas.append(person)
-    return person
+@app.post("/vehiculos", response_model=Vehiculo)
+def crear_vehiculo(vehiculo: Vehiculo):
+    vehiculoList.append(vehiculo)
+    return vehiculo
 
-@app.get("/personas", response_model=List[Persona])
-def obtener_personas():
-    return listaPersonas
+@app.get("/vehiculos", response_model=List[Vehiculo])
+def get_vehiculos():
+    return vehiculoList
 
-@app.get("/personas/{persona_id}",response_model=Persona)
-def buscar_persona(persona_id: int):
-    for persona in listaPersonas:
-        if persona.id == persona_id:
-            return persona
-    raise HTTPException(status_code=404, detail="Persona no encontrada")
+@app.get("/vehiculos/{vehiculo_id}", response_model=Vehiculo)
+def obtener_vehiculo (vehiculo_id: int):
+    for vehiculo in vehiculoList:
+        if vehiculo.id == vehiculo_id:
+            return vehiculo
+    raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
+
+@app.delete("/vehiculos/{vehiculo_id}", response_model=List[Vehiculo])
+def eliminar_vehiculo (vehiculo_id: int):
+    for vehiculo in vehiculoList:
+        if vehiculo.id == vehiculo_id:
+            vehiculoList.remove(vehiculo)
+            return vehiculoList
+    raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
 @app.get("/")
 def read_root():
-    return {"Hello": "Interoperavilidad"}
+    return {"Tarea 1": "Interoperabilidad Empresarial"}
