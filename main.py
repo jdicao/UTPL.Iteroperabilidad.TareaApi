@@ -38,6 +38,7 @@ def eliminar_vehiculo (vehiculo_id: int):
             return vehiculoList
     raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
+
 @app.get("/")
 def read_root():
     return {"Tarea 1": "Interoperabilidad Empresarial"}
