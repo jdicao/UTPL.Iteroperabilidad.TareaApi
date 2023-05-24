@@ -41,4 +41,4 @@ def eliminar_vehiculo (vehiculo_id: int):
 
 @app.get("/")
 def read_root():
-    return {"Tarea 1": "Interoperabilidad Empresarial - Cloud Deployment"}
+    return {"Tarea": "Interoperabilidad Empresarial - Cloud Deployment"}
