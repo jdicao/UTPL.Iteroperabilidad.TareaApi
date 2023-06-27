@@ -21,6 +21,12 @@ Se puede: **Crear, listar y eliminar Vehiculos**.
 Se puede: **Obtener informacion de una pista, Obtener informacion de un artista**.
 
 """
+tags_metadata = [
+    {
+        "name":"Vehiculos",
+        "description": "Permite realizar un crud completo de una Vehiculo (listar)"
+    }
+]
 
 #app = FastAPI()
 app = FastAPI(
@@ -36,7 +42,8 @@ app = FastAPI(
     license_info={
         "name": "Apache 2.0",
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-    }
+    },
+    openapi_tags = tags_metadata
 
 )
 
@@ -50,23 +57,23 @@ class Vehiculo (BaseModel):
 
 vehiculoList = []
 
-@app.post("/vehiculos", response_model=Vehiculo)
+@app.post("/vehiculos", response_model=Vehiculo, tags = ["Vehiculos"])
 def crear_vehiculo(vehiculo: Vehiculo):
     vehiculoList.append(vehiculo)
     return vehiculo
 
-@app.get("/vehiculos", response_model=List[Vehiculo])
+@app.get("/vehiculos", response_model=List[Vehiculo], tags = ["Vehiculos"])
 def get_vehiculos():
     return vehiculoList
 
-@app.get("/vehiculos/{vehiculo_id}", response_model=Vehiculo)
+@app.get("/vehiculos/{vehiculo_id}", response_model=Vehiculo, tags = ["Vehiculos"])
 def obtener_vehiculo (vehiculo_id: int):
     for vehiculo in vehiculoList:
         if vehiculo.id == vehiculo_id:
             return vehiculo
     raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
-@app.delete("/vehiculos/{vehiculo_id}", response_model=List[Vehiculo])
+@app.delete("/vehiculos/{vehiculo_id}", response_model=List[Vehiculo], tags = ["Vehiculos"])
 def eliminar_vehiculo (vehiculo_id: int):
     for vehiculo in vehiculoList:
         if vehiculo.id == vehiculo_id:
