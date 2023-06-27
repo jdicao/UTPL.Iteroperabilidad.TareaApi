@@ -4,13 +4,41 @@ from typing import List, Optional
 
 import spotipy
 
-
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
     client_secret='277c6fb54b6f43a9be9c680ab2df1e4f'
 ))
 
-app = FastAPI()
+description = """
+Utpl tnteroperabilidad API ayuda a describir las capacidades de un directorio. 🚀
+
+## Vehiculos
+ 
+Se puede: **Crear, listar y eliminar Vehiculos**.
+
+## Artisitas
+
+Se puede: **Obtener informacion de una pista, Obtener informacion de un artista**.
+
+"""
+
+#app = FastAPI()
+app = FastAPI(
+    title="Utpl Interoperabilidad APP",
+    description = description,
+    version="0.0.1",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "Jefferson Dicao C.",
+        "url": "http://x-force.example.com/contact/",
+        "email": "jpdicao@utpl.edu.ec",
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    }
+
+)
 
 class Vehiculo (BaseModel):
     id: int
