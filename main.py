@@ -2,6 +2,14 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 
+import spotipy
+
+
+sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
+    client_id='445c231e6c904ac6a4c338301b9b2ca2',
+    client_secret='277c6fb54b6f43a9be9c680ab2df1e4f'
+))
+
 app = FastAPI()
 
 class Vehiculo (BaseModel):
@@ -38,6 +46,10 @@ def eliminar_vehiculo (vehiculo_id: int):
             return vehiculoList
     raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
+@app.get("/pista/{track_id}")
+async def obenter_pista(track_id: str):
+    pista = sp.track(track_id)
+    return pista
 
 @app.get("/")
 def read_root():
