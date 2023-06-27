@@ -51,6 +51,11 @@ async def obenter_pista(track_id: str):
     pista = sp.track(track_id)
     return pista
 
+@app.get("/artistas/{artista_id}")
+async def get_artista(artista_id: str):
+    artista = sp.artist(artista_id)
+    return artista
+
 @app.get("/")
 def read_root():
     return {"Tarea Interoperabilidad": "Tercer cambio para prueba de despliegue"}
