@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 import spotipy
+import pymongo
+
 
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
@@ -47,8 +49,21 @@ app = FastAPI(
 
 )
 
-class Vehiculo (BaseModel):
-    id: int
+#configuracion de mongo
+
+cliente = pymongo.MongoClient("mongodb+srv://utplapi:b3wUGM7SlqvYIIRC@cluster01jdc.dixpkq6.mongodb.net/?retryWrites=true&w=majority")
+database = client["concesionario"]
+colecion = database["vehiculo"]
+
+class VehiculoRepositorio (BaseModel):
+    id: str
+    tipo: str
+    marca: str
+    modelo: str
+    anio: int
+    descripcion: Optional[str] = None
+
+class VehiculoEntrada (BaseModel):
     tipo: str
     marca: str
     modelo: str
@@ -57,16 +72,16 @@ class Vehiculo (BaseModel):
 
 vehiculoList = []
 
-@app.post("/vehiculos", response_model=Vehiculo, tags = ["Vehiculos"])
-def crear_vehiculo(vehiculo: Vehiculo):
+@app.post("/vehiculos", response_model=VehiculoEntrada, tags = ["Vehiculos"])
+def crear_vehiculo(vehiculo: VehiculoEntrada):
     vehiculoList.append(vehiculo)
     return vehiculo
 
-@app.get("/vehiculos", response_model=List[Vehiculo], tags = ["Vehiculos"])
+@app.get("/vehiculos", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 def get_vehiculos():
     return vehiculoList
 
-@app.get("/vehiculos/{vehiculo_id}", response_model=Vehiculo, tags = ["Vehiculos"])
+@app.get("/vehiculos/{vehiculo_id}", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
 def obtener_vehiculo (vehiculo_id: int):
     for vehiculo in vehiculoList:
         if vehiculo.id == vehiculo_id:
