@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import spotipy
 import pymongo
-
+import uuid
 
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
@@ -51,9 +51,10 @@ app = FastAPI(
 
 #configuracion de mongo
 
-cliente = pymongo.MongoClient("mongodb+srv://utplapi:b3wUGM7SlqvYIIRC@cluster01jdc.dixpkq6.mongodb.net/?retryWrites=true&w=majority")
-database = client["concesionario"]
-colecion = database["vehiculo"]
+#cliente = pymongo.MongoClient("mongodb+srv://utplapi:1Xh41Mq3imkRCxbc@cluster01jdc.dixpkq6.mongodb.net/?retryWrites=true&w=majority")
+cliente = pymongo.MongoClient("mongodb+srv://utplapi:VtFbaCLGheOU389I@cluster01jdc.dixpkq6.mongodb.net/")
+database = cliente["concesionario"]
+coleccion = database["vehiculo"]
 
 class VehiculoRepositorio (BaseModel):
     id: str
@@ -72,10 +73,12 @@ class VehiculoEntrada (BaseModel):
 
 vehiculoList = []
 
-@app.post("/vehiculos", response_model=VehiculoEntrada, tags = ["Vehiculos"])
-def crear_vehiculo(vehiculo: VehiculoEntrada):
-    vehiculoList.append(vehiculo)
-    return vehiculo
+@app.post("/vehiculos", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
+async def crear_vehiculo(vehiculoE: VehiculoEntrada):
+    #vehiculoList.append(vehiculo)
+    itemVehiculo = VehiculoRepositorio(id = str(uuid.uuid4()), tipo = vehiculoE.tipo, marca = vehiculoE.marca, modelo = vehiculoE.modelo, anio = vehiculoE.anio, descripcion = vehiculoE.descripcion )
+    resultadoDB =  coleccion.insert_one(itemVehiculo.dict())
+    return itemVehiculo
 
 @app.get("/vehiculos", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 def get_vehiculos():
@@ -88,7 +91,7 @@ def obtener_vehiculo (vehiculo_id: int):
             return vehiculo
     raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
-@app.delete("/vehiculos/{vehiculo_id}", response_model=List[Vehiculo], tags = ["Vehiculos"])
+@app.delete("/vehiculos/{vehiculo_id}", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 def eliminar_vehiculo (vehiculo_id: int):
     for vehiculo in vehiculoList:
         if vehiculo.id == vehiculo_id:
