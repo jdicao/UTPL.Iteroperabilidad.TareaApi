@@ -6,6 +6,8 @@ import spotipy
 import pymongo
 import uuid
 
+from fastapi_versioning import VersionedFastAPI, version
+
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
     client_secret='277c6fb54b6f43a9be9c680ab2df1e4f'
@@ -89,11 +91,16 @@ def get_vehiculos():
     #vehiculoList
 
 @app.get("/vehiculos/{vehiculo_id}", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
-def obtener_vehiculo (vehiculo_id: int):
-    for vehiculo in vehiculoList:
-        if vehiculo.id == vehiculo_id:
-            return vehiculo
-    raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
+def obtener_vehiculo (vehiculo_id: str):
+    item = coleccion.find_one({"id": vehiculo_id})
+    if item:
+        return item
+    else:
+        raise HTTPException(status_code=404, detail="Vehiculo no encontrado")    
+    #for vehiculo in vehiculoList:
+    #    if vehiculo.id == vehiculo_id:
+    #        return vehiculo
+    #raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
 @app.delete("/vehiculos/{vehiculo_id}", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 def eliminar_vehiculo (vehiculo_id: int):
