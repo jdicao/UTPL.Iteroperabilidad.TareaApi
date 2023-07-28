@@ -82,9 +82,11 @@ async def crear_vehiculo(vehiculoE: VehiculoEntrada):
 
 @app.get("/vehiculos", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 def get_vehiculos():
-    items = list(coleccion.find())
+    items = list(coleccion.find({}, {'_id': 0}))
     print (items)
-    return items #vehiculoList
+    #vehiculoList.append(items)
+    return items
+    #vehiculoList
 
 @app.get("/vehiculos/{vehiculo_id}", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
 def obtener_vehiculo (vehiculo_id: int):
