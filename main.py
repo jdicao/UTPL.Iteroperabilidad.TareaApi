@@ -5,6 +5,7 @@ from typing import List, Optional
 import spotipy
 import pymongo
 import uuid
+from auth import *
 
 from fastapi_versioning import VersionedFastAPI, version
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
