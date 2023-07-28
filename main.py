@@ -6,7 +6,7 @@ import spotipy
 import pymongo
 import uuid
 
-#from fastapi_versioning import VersionedFastAPI, version
+from fastapi_versioning import VersionedFastAPI, version
 
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
@@ -51,7 +51,8 @@ app = FastAPI(
 
 )
 
-#configuracion de mongo
+#para manejar seguridad
+security = HTTPBasic()
 
 #cliente = pymongo.MongoClient("mongodb+srv://utplapi:1Xh41Mq3imkRCxbc@cluster01jdc.dixpkq6.mongodb.net/?retryWrites=true&w=majority")
 cliente = pymongo.MongoClient("mongodb+srv://utplapi:VtFbaCLGheOU389I@cluster01jdc.dixpkq6.mongodb.net/")
@@ -64,6 +65,7 @@ class VehiculoRepositorio (BaseModel):
     marca: str
     modelo: str
     anio: int
+    color: Optional[str] = None
     descripcion: Optional[str] = None
 
 class VehiculoEntrada (BaseModel):
@@ -73,17 +75,36 @@ class VehiculoEntrada (BaseModel):
     anio: int
     descripcion: Optional[str] = None
 
+class VehiculoEntradaV2 (BaseModel):
+    tipo: str
+    marca: str
+    modelo: str
+    anio: int
+    color: str
+    descripcion: Optional[str] = None
+
 vehiculoList = []
 
 @app.post("/vehiculos", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
+@version(1, 0)
 async def crear_vehiculo(vehiculoE: VehiculoEntrada):
     #vehiculoList.append(vehiculo)
     itemVehiculo = VehiculoRepositorio(id = str(uuid.uuid4()), tipo = vehiculoE.tipo, marca = vehiculoE.marca, modelo = vehiculoE.modelo, anio = vehiculoE.anio, descripcion = vehiculoE.descripcion )
     resultadoDB =  coleccion.insert_one(itemVehiculo.dict())
     return itemVehiculo
 
+@app.post("/vehiculos", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
+@version(2, 0)
+async def crear_vehiculoV2(vehiculoE: VehiculoEntradaV2):
+    #vehiculoList.append(vehiculo)
+    itemVehiculo = VehiculoRepositorio(id = str(uuid.uuid4()), tipo = vehiculoE.tipo, marca = vehiculoE.marca, modelo = vehiculoE.modelo, anio = vehiculoE.anio, descripcion = vehiculoE.descripcion, color = vehiculoE.color )
+    resultadoDB =  coleccion.insert_one(itemVehiculo.dict())
+    return itemVehiculo    
+
 @app.get("/vehiculos", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
-def get_vehiculos():
+@version(1, 0)
+def get_vehiculos(credentials: HTTPBasicCredentials = Depends(security)):
+    authenticate(credentials)
     items = list(coleccion.find({}, {'_id': 0}))
     print (items)
     #vehiculoList.append(items)
@@ -91,6 +112,7 @@ def get_vehiculos():
     #vehiculoList
 
 @app.get("/vehiculos/{vehiculo_id}", response_model=VehiculoRepositorio, tags = ["Vehiculos"])
+@version(1, 0)
 def obtener_vehiculo (vehiculo_id: str):
     item = coleccion.find_one({"id": vehiculo_id})
     if item:
@@ -103,6 +125,7 @@ def obtener_vehiculo (vehiculo_id: str):
     #raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
 @app.delete("/vehiculos/{vehiculo_id}", tags = ["Vehiculos"])
+@version(1, 0)
 def eliminar_vehiculo (vehiculo_id: str):
     result = coleccion.delete_one({"id": vehiculo_id})
     if result.deleted_count == 1:
@@ -117,11 +140,13 @@ def eliminar_vehiculo (vehiculo_id: str):
     #raise HTTPException(status_code=404, detail="Vehiculo no encontrado")
 
 @app.get("/pista/{track_id}")
+@version(1, 0)
 async def obenter_pista(track_id: str):
     pista = sp.track(track_id)
     return pista
 
 @app.get("/artistas/{artista_id}")
+@version(1, 0)
 async def get_artista(artista_id: str):
     artista = sp.artist(artista_id)
     return artista
@@ -129,3 +154,5 @@ async def get_artista(artista_id: str):
 @app.get("/")
 def read_root():
     return {"Tarea Interoperabilidad": "Tercer cambio para prueba de despliegue"}
+
+app = VersionedFastAPI(app)
