@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -7,6 +7,7 @@ import pymongo
 import uuid
 
 from fastapi_versioning import VersionedFastAPI, version
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 sp = spotipy.Spotify(auth_manager=spotipy.oauth2.SpotifyClientCredentials(
     client_id='445c231e6c904ac6a4c338301b9b2ca2',
