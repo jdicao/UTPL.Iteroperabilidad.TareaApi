@@ -105,8 +105,8 @@ async def crear_vehiculoV2(vehiculoE: VehiculoEntradaV2):
 
 @app.get("/vehiculos", response_model=List[VehiculoRepositorio], tags = ["Vehiculos"])
 @version(1, 0)
-def get_vehiculos(credentials: HTTPBasicCredentials = Depends(security)):
-    authenticate(credentials)
+def get_vehiculos():
+    #authenticate(credentials)
     items = list(coleccion.find({}, {'_id': 0}))
     print (items)
     #vehiculoList.append(items)
